@@ -10,15 +10,17 @@ function List(props) {
     const onRemoveItem = props.onRemoveItem;
 
     return (
-      <li>
-        <span>
+      <li className='item'>
+        <span style={{width: '40%'}}>
           <a href={e.url}>{e.title}</a>
         </span>
-        <span>{e.author}</span>
-        <span>{e.num_comments}</span>
-        <span>{e.points}</span>
-        <span>
-          <button type='button' onClick={() => onRemoveItem(e)}>dismiss</button>
+        <span style={{width: '20%'}}>{e.author}</span>
+        <span style={{width: '10%'}}>{e.num_comments}</span>
+        <span style={{width: '10%'}}>{e.points}</span>
+        <span style={{width: '10%'}}>
+          <button type='button' onClick={() => onRemoveItem(e)} className='button button_small'>
+            dismiss
+          </button>
         </span>
       </li>
     );
@@ -44,16 +46,16 @@ function InputWithLabel ({id, label, value, onInputChange, isFocused, children})
 
   return (
     <>
-      <label htmlFor={id}>{children}</label>
+      <label htmlFor={id} className='label'>{children}</label>
       &nbsp;
-      <input type='text' id={id} value={value} onChange={onInputChange} ref={inputRef}/>
+      <input type='text' id={id} value={value} onChange={onInputChange} ref={inputRef} className='input'/>
     </>
   );
 }
 
 function SearchForm({onSubmit, searchTerm, onSearch}) {
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} className='search-form'>
         <InputWithLabel id='search' 
           value={searchTerm} 
           onInputChange={onSearch}
@@ -61,7 +63,7 @@ function SearchForm({onSubmit, searchTerm, onSearch}) {
           Search:
         </InputWithLabel>
         &nbsp;&nbsp;
-        <button type='submit' disabled={!searchTerm}>Submit</button>
+        <button type='submit' disabled={!searchTerm} className='button button_large'>Submit</button>
     </form>
   );
 }
@@ -169,8 +171,8 @@ function App() {
 
   return (
     <>
-      <div>
-        <h1>Hacker Stories</h1>
+      <div className='container'>
+        <h1 className='headline-primary'>Hacker Stories</h1>
         <SearchForm searchTerm={searchTerm} onSearch={onSearch} onSubmit={onSearchSubmit}></SearchForm>
         <hr/>
         {story.isError && (<p>Something went wrong...</p>)}
