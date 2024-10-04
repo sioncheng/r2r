@@ -1,73 +1,27 @@
 import { useState , useEffect, useRef, useReducer, useCallback } from 'react'
 import axios from 'axios'
 import './App.css'
+import {List} from './List'
+import {InputWithLabel} from './InputWithLabel'
+import {SearchForm} from './SearchForm'
 
+const [STORY_ACTION_LDG, STORY_ACTION_SET, STORY_ACTION_DEL, STORY_ACTION_ERR] = ['LDG', 'SET', 'DEL', 'ERR'];
 
-function List(props) {
-
-  function Item(props) {
-    const e = props.item;
-    const onRemoveItem = props.onRemoveItem;
-
-    return (
-      <li className='item'>
-        <span style={{width: '40%'}}>
-          <a href={e.url}>{e.title}</a>
-        </span>
-        <span style={{width: '20%'}}>{e.author}</span>
-        <span style={{width: '10%'}}>{e.num_comments}</span>
-        <span style={{width: '10%'}}>{e.points}</span>
-        <span style={{width: '10%'}}>
-          <button type='button' onClick={() => onRemoveItem(e)} className='button button_small'>
-            dismiss
-          </button>
-        </span>
-      </li>
-    );
+const storyReducer = (state, action) => {
+  switch (action.type) {
+    case STORY_ACTION_LDG:
+      return {...state, isLoading: true}
+    case STORY_ACTION_SET:
+      return {...state, isLoading: false, data: action.payload}
+    case STORY_ACTION_DEL:
+      const newData = state.data.filter((s) => s.objectID != action.payload.objectID);
+      return {...state, data: newData}; 
+      case STORY_ACTION_ERR:
+        return {...state, isLoading: false, isError: true}
+    default:
+      throw new Error("unknow [" + action.type + "] for dispatch stories");
   }
-
-  return (
-    <ul>
-      {/* comments */}
-      {
-        props.stories.map(e => (<Item key={e.objectID} item={e} onRemoveItem={props.onRemoveItem}/>))
-      }
-    </ul>
-  );
-}
-
-function InputWithLabel ({id, label, value, onInputChange, isFocused, children}) {
-  const inputRef = useRef();
-  useEffect(() => {
-    if (isFocused && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isFocused]);
-
-  return (
-    <>
-      <label htmlFor={id} className='label'>{children}</label>
-      &nbsp;
-      <input type='text' id={id} value={value} onChange={onInputChange} ref={inputRef} className='input'/>
-    </>
-  );
-}
-
-function SearchForm({onSubmit, searchTerm, onSearch}) {
-  return (
-    <form onSubmit={onSubmit} className='search-form'>
-        <InputWithLabel id='search' 
-          value={searchTerm} 
-          onInputChange={onSearch}
-          isFocused={true}>
-          Search:
-        </InputWithLabel>
-        &nbsp;&nbsp;
-        <button type='submit' disabled={!searchTerm} className='button button_large'>Submit</button>
-    </form>
-  );
-}
-
+};
 
 function App() {
   
@@ -90,25 +44,6 @@ function App() {
       objectID: 1
     }
   ];
-
-  const [STORY_ACTION_LDG, STORY_ACTION_SET, STORY_ACTION_DEL, STORY_ACTION_ERR] = ['LDG', 'SET', 'DEL', 'ERR'];
-
-  const storyReducer = (state, action) => {
-    switch (action.type) {
-      case STORY_ACTION_LDG:
-        return {...state, isLoading: true}
-      case STORY_ACTION_SET:
-        return {...state, isLoading: false, data: action.payload}
-      case STORY_ACTION_DEL:
-        const newData = state.data.filter((s) => s.objectID != action.payload.objectID);
-        return {...state, data: newData}; 
-        case STORY_ACTION_ERR:
-          return {...state, isLoading: false, isError: true}
-      default:
-        throw new Error("unknow [" + action.type + "] for dispatch stories");
-    }
-  };
-
 
   const [searchTerm, setSearchTerm] = useStorageState('search', 'React');
   const [url, setUrl] = useState('')
@@ -174,7 +109,6 @@ function App() {
       <div className='container'>
         <h1 className='headline-primary'>Hacker Stories</h1>
         <SearchForm searchTerm={searchTerm} onSearch={onSearch} onSubmit={onSearchSubmit}></SearchForm>
-        <hr/>
         {story.isError && (<p>Something went wrong...</p>)}
         {story.isLoading ?
           (<p>loading...</p>)
@@ -189,3 +123,4 @@ function App() {
 }
 
 export default App;
+export {storyReducer};
